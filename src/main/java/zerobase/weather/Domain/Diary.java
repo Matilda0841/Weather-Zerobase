@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @AllArgsConstructor
-public class Dairy {
+public class Diary {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
