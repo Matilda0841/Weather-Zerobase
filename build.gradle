@@ -22,10 +22,15 @@ repositories {
 }
 
 dependencies {
+	// mariaDB
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:2.7.3' // as of 2023-07-27
 }
 
 tasks.named('test') {
