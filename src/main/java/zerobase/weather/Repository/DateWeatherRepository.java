@@ -1,8 +1,9 @@
 package zerobase.weather.Repository;
 
+import zerobase.weather.Domain.DateWeather;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import zerobase.weather.Domain.DateWeather;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,5 +11,5 @@ import java.util.List;
 @Repository
 public interface DateWeatherRepository extends JpaRepository<DateWeather, LocalDate> {
 
-  List<DateWeather> findAllByDate (LocalDate localDate);
+  List<DateWeather> findAllByDate(LocalDate localDate);
 }

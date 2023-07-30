@@ -1,5 +1,7 @@
 package zerobase.weather.Controller;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import zerobase.weather.Domain.Diary;
@@ -12,42 +14,46 @@ import java.util.List;
 public class DiaryController {
   private final DiaryService diaryService;
 
+  //    @Autowired
   public DiaryController(DiaryService diaryService) {
     this.diaryService = diaryService;
   }
 
+  @ApiOperation(value = "일기 텍스트와 날씨를 이용해서 db에 일기 저장", notes = "이것은 노트")
   @PostMapping("/create/diary")
-  void createDairy(
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-      @RequestBody String text) {
-
+  void createDiary(@RequestParam
+                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                   LocalDate date,
+                   @RequestBody
+                   String text) {
     diaryService.createDiary(date, text);
+
   }
 
+  @ApiOperation("선택한 날짜에 모든 일기 데이터 조회")
   @GetMapping("/read/diary")
-  List<Diary> readDiary(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+  List<Diary> readDiary(@RequestParam @DateTimeFormat
+      (iso = DateTimeFormat.ISO.DATE) LocalDate date) {
     return diaryService.readDiary(date);
   }
 
-  @GetMapping("/read/diaries")
+  @ApiOperation("선택한 기간 동아 모든 일기 데이터 조회")
+  @GetMapping("read/diaries")
   List<Diary> readDiaries(
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-  ) {
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @ApiParam(value = "조회할 기간의 첫번째 날", example = "2020-02-02") LocalDate startDate,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @ApiParam(value = "조회할 기간의 마지막 날", example = "2020-02-02") LocalDate endDate) {
     return diaryService.readDiaries(startDate, endDate);
   }
 
+  @ApiOperation("hype boy")
   @PutMapping("/update/diary")
-  void updateDiary(
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-      @RequestBody String text
-  ) {
+  void updateDiary(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                   @RequestBody String text) {
     diaryService.updateDiary(date, text);
   }
 
   @DeleteMapping("/delete/diary")
-  void deleteDiary(
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+  void deleteDiary(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
     diaryService.deleteDiary(date);
   }
 }

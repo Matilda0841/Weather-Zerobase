@@ -1,9 +1,10 @@
 package zerobase.weather.Repository;
 
+import zerobase.weather.Domain.Diary;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import zerobase.weather.Domain.Diary;
 
 import java.time.LocalDate;
 import java.util.List;

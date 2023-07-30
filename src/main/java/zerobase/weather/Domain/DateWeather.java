@@ -2,7 +2,9 @@ package zerobase.weather.Domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -10,12 +12,11 @@ import java.time.LocalDate;
 @Setter
 @Entity(name = "date_weather")
 @NoArgsConstructor
-@AllArgsConstructor
-@ToString
 public class DateWeather {
   @Id
   private LocalDate date;
   private String weather;
   private String icon;
   private double temperature;
+
 }
