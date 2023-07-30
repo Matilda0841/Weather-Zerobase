@@ -5,8 +5,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+import zerobase.weather.Domain.DateWeather;
 import zerobase.weather.Domain.Diary;
+import zerobase.weather.Repository.DateWeatherRepository;
 import zerobase.weather.Repository.DiaryRepository;
 
 import java.io.BufferedReader;
@@ -19,31 +24,62 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional(readOnly = true)
 public class DiaryService {
   private final DiaryRepository diaryRepository;
+
+  private final DateWeatherRepository dateWeatherRepository;
 
   @Value("${openWeatherMap.key}")
   private String APIKEY;
 
-  public DiaryService(DiaryRepository diaryRepository) {
+  public DiaryService(DiaryRepository diaryRepository, DateWeatherRepository dateWeatherRepository) {
     this.diaryRepository = diaryRepository;
+    this.dateWeatherRepository = dateWeatherRepository;
   }
 
-  public void createDiary(LocalDate date, String text) {
-    String weatherData = getWeatherString();
+  @Transactional
+  @Scheduled(cron = "0 0 1 * * *")
+  public void saveWeatherDate() {
+    dateWeatherRepository.save(getWeatherFromApi());
+  }
 
-    Map<String, Object> parseWeather = parseWeather(weatherData);
+  @Transactional(isolation = Isolation.SERIALIZABLE)
+  public void createDiary(LocalDate date, String text) {
+    DateWeather dateWeather = getDateWeather(date);
+
 
     Diary nowDiary = new Diary();
-    nowDiary.setWeather(parseWeather.get("main").toString());
-    nowDiary.setIcon(parseWeather.get("icon").toString());
-    nowDiary.setTemperature((Double) parseWeather.get("temp"));
+    nowDiary.setDateWeather(dateWeather);
     nowDiary.setText(text);
     nowDiary.setDate(date);
     diaryRepository.save(nowDiary);
 
   }
 
+  private DateWeather getWeatherFromApi() {
+    String weatherDate = getWeatherString();
+
+    Map<String, Object> parseWeather = parseWeather(weatherDate);
+    DateWeather dateWeather = new DateWeather();
+    dateWeather.setDate(LocalDate.now());
+    dateWeather.setWeather(parseWeather.get("main").toString());
+    dateWeather.setIcon(parseWeather.get("icon").toString());
+    dateWeather.setTemperature((Double) parseWeather.get("temp"));
+
+    return dateWeather;
+  }
+
+  private DateWeather getDateWeather(LocalDate date) {
+    List<DateWeather> dateWeatherListFromDB = dateWeatherRepository.findAllByDate(date);
+    if (dateWeatherListFromDB.size() == 0) {
+      return getWeatherFromApi();
+    } else {
+      return dateWeatherListFromDB.get(0);
+    }
+  }
+
+  @Transactional(readOnly = true)
   public List<Diary> readDiary(LocalDate date) {
     return diaryRepository.findAllByDate(date);
   }
